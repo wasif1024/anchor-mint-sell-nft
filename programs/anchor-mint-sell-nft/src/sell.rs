@@ -12,7 +12,7 @@ use {
 
 pub fn sell(
     ctx: Context<SellNft>,
-    sale_lamports: u64
+    sale_lamports: u64,amount_transfer:u64
 ) -> Result<()> {
 
     msg!("Initiating transfer of {} lamports...", sale_lamports);
@@ -64,6 +64,40 @@ pub fn sell(
     )?;
     msg!("NFT transferred successfully.");
     
+
+    msg!("Buyer SPL Token Address: {}", &ctx.accounts.buyer_spl_token_account.key());    
+    //associated_token::
+    /*associated_token::create(
+        CpiContext::new(
+            ctx.accounts.associated_token_program.to_account_info(),
+            associated_token::Create {
+                payer: ctx.accounts.buyer_authority.to_account_info(),
+                associated_token: ctx.accounts.buyer_spl_token_account.to_account_info(),
+                authority: ctx.accounts.buyer_authority.to_account_info(),
+                mint: ctx.accounts.splmint.to_account_info(),
+                system_program: ctx.accounts.system_program.to_account_info(),
+                token_program: ctx.accounts.token_program.to_account_info(),
+                rent: ctx.accounts.rent.to_account_info(),
+            },
+        ),
+    )?;*/
+
+    msg!("Transferring NFT...");
+    msg!("Owner Token Address: {}", &ctx.accounts.owner_spl_token_account.key());    
+    msg!("Buyer Token Address: {}", &ctx.accounts.buyer_spl_token_account.key());    
+    token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            token::Transfer {
+                from: ctx.accounts.owner_spl_token_account.to_account_info(),
+                to: ctx.accounts.buyer_spl_token_account.to_account_info(),
+                authority: ctx.accounts.treasury_wallet.to_account_info(),
+            }
+        ),
+        amount_transfer
+    )?;
+    msg!("Spl Reward Token transferred successfully.");
+
     msg!("Sale completed successfully!");
 
     Ok(())
@@ -75,12 +109,21 @@ pub struct SellNft<'info> {
     #[account(mut)]
     pub mint: Account<'info, token::Mint>,
     #[account(mut)]
+    pub splmint: Account<'info, token::Mint>,
+    #[account(mut)]
     pub owner_token_account: Account<'info, token::TokenAccount>,
     #[account(mut)]
+    pub owner_spl_token_account: Account<'info, token::TokenAccount>,
+    #[account(mut)]
     pub owner_authority: Signer<'info>,
+    #[account(mut)]
+    pub treasury_wallet: Signer<'info>,
     /// CHECK: We're about to create this with Anchor
     #[account(mut)]
     pub buyer_token_account: UncheckedAccount<'info>,
+    /// CHECK: We're about to create this with Anchor
+    #[account(mut)]
+    pub buyer_spl_token_account: UncheckedAccount<'info>,
     #[account(mut)]
     pub buyer_authority: Signer<'info>,
     pub rent: Sysvar<'info, Rent>,

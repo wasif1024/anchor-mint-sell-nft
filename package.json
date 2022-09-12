@@ -5,6 +5,7 @@
     },
     "dependencies": {
         "@project-serum/anchor": "^0.25.0",
+        "@solana/spl-token": "^0.3.4",
         "@types/mz": "^2.7.4",
         "mz": "^2.7.0"
     },

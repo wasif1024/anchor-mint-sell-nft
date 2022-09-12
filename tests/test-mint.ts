@@ -3,8 +3,8 @@ import { Program } from "@project-serum/anchor";
 import { AnchorMintSellNft } from "../target/types/anchor_mint_sell_nft";
 
 describe("anchor-mint-sell-nft", () => {
-  const testNftTitle = "Beta";
-  const testNftSymbol = "BETA";
+  const testNftTitle = "Mbb Nft 1";
+  const testNftSymbol = "MbbNft1";
   const testNftUri = "https://raw.githubusercontent.com/Coding-and-Crypto/Solana-NFT-Marketplace/master/assets/example.json";
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
@@ -54,7 +54,7 @@ describe("anchor-mint-sell-nft", () => {
     // Transact with the "mint" function in our on-chain program
 
     await program.methods.mint(
-      testNftTitle, testNftSymbol, testNftUri
+      testNftTitle, testNftSymbol, testNftUri, new anchor.BN(10)
     )
       .accounts({
         masterEdition: masterEditionAddress,
